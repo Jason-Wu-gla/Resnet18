@@ -14,6 +14,3 @@ if device == 'cuda':
 model, loss_history = train(model, 200)
 plot(loss_history)
 
-"""
-test git
-"""
