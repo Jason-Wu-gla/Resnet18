@@ -82,7 +82,7 @@ def train(model, num_epoch):
 
     if not os.path.exists(saveDir):
         os.mkdir(saveDir)
-        saveDir = saveDir + str(epoch) 
+        saveDir = saveDir + 'default'+ str(epoch) 
         torch.save(model.state_dict(), saveDir)
     # patience=3, threshold=1e-3
     # if len(loss_history) >= patience + 1:
