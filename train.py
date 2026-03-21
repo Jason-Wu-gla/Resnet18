@@ -3,6 +3,7 @@ import numpy as np
 import torch.nn.functional as F
 import DataLoader
 from test import test
+import os
 
 def train(model, num_epoch):
     print("Start training")
@@ -14,6 +15,7 @@ def train(model, num_epoch):
     success_history = []
     val_loss_history = []
     val_success_history = []
+    saveDir = "C:/PycharmProjects/Resnet18/model weights/"
     for epoch in range(num_epoch):
         # init the parameters of trainset
         correct_preds_all = 0
@@ -77,6 +79,11 @@ def train(model, num_epoch):
         val_success_history.append(val_success_rate)
 
 
+
+    if not os.path.exists(saveDir):
+        os.mkdir(saveDir)
+        saveDir = saveDir + str(epoch) 
+        torch.save(model.state_dict(), saveDir)
     # patience=3, threshold=1e-3
     # if len(loss_history) >= patience + 1:
     #    # 检查最近 patience 轮的相邻损失差值
