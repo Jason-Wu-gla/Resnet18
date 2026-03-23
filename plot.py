@@ -54,6 +54,34 @@ def plot_validation_success_rate(val_success_history, save_path=None, show=True)
 
     _save_and_show(save_path, show)
 
+def plot_learning_rate_comparison(file_paths, save_path=None, show=True):
+    plt.figure(figsize=(10, 6))
+    colors = plt.cm.tab10(np.linspace(0, 1, len(file_paths)))  # 使用颜色映射生成不同颜色
+
+    for i, file_path in enumerate(file_paths):
+        if not os.path.exists(file_path):
+            print(f"文件 {file_path} 不存在，跳过...")
+            continue
+
+        # 从文件名中提取学习率
+        try:
+            learning_rate = float(file_path.split('_lr_')[1].split('.npy')[0])
+        except (IndexError, ValueError):
+            print(f"无法从文件名中提取学习率: {file_path}")
+            learning_rate = f"未知_{i}"
+
+        # 加载数据并绘制曲线
+        step_losses = np.load(file_path)
+        steps = range(1, len(step_losses) + 1)
+        plt.plot(steps, step_losses, label=f"LR={learning_rate}", color=colors[i])
+
+    plt.xlabel("Step")
+    plt.ylabel("Loss")
+    plt.title("Loss vs Step for Different Learning Rates")
+    plt.legend()
+    plt.grid(True)
+
+    _save_and_show(save_path, show)
 
 def _save_and_show(save_path, show):
     if save_path:

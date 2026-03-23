@@ -22,19 +22,16 @@ model, loss_history, success_history, val_loss_history, val_success_history, tra
 
 # 保存step-loss数据到results/data
 os.makedirs('results/data', exist_ok=True)
-np.save(f'results/data/train_step_losses_lr_{params.learning_rate}.npy', train_step_losses)
-np.save(f'results/data/val_step_losses_lr_{params.learning_rate}.npy', val_step_losses)
+np.save(f'results/data/loss/train_step_losses_lr_{params.learning_rate}.npy', train_step_losses)
+np.save(f'results/data/loss/val_step_losses_lr_{params.learning_rate}.npy', val_step_losses)
 print(f"Step-loss data saved for learning rate {params.learning_rate}")
-
-# 绘制step-loss曲线
-plot_step_loss_curves(data_dir='results/data', save_path='results/plot/step_loss_curves.png')
 
 # 保存训练数据到 results/data
 os.makedirs('results/data', exist_ok=True)
-np.save('results/data/loss_history.npy', loss_history)
-np.save('results/data/success_history.npy', success_history)
-np.save('results/data/val_loss_history.npy', val_loss_history)
-np.save('results/data/val_success_history.npy', val_success_history)
+np.save('results/data/loss/loss_history.npy', loss_history)
+np.save('results/data/success/success_history.npy', success_history)
+np.save('results/data/loss/val_loss_history.npy', val_loss_history)
+np.save('results/data/success/val_success_history.npy', val_success_history)
 print("Training data saved to results/data/")
 
 # Visualize training results and save plots to results/plot
