@@ -5,22 +5,27 @@ import numpy as np
 
 def calculate_mean_std(data_loader):
     """
-    计算数据加载器中所有图像的通道均值和标准差
+    计算数据加载器中所有图像的通道均值和标准差。
+    方法：对每个通道在所有像素级别求和，再除以总像素数，得到全局均值；
+    再用全局方差公式：E[x^2] - E[x]^2，得到标准差。这样得到的结果才是对整数据集的真实统计量。
     """
-    mean = 0.0
-    std = 0.0
-    total_samples = 0
+    # 使用 CPU 的张量，确保最终输出为 numpy 数组
+    sum_ = torch.zeros(3)
+    sum_sq = torch.zeros(3)
+    total_count = 0  # 总像素数（N * C * H * W 在遍历结束时应一致）
 
     for images, _ in data_loader:
         # images: [batch_size, 3, height, width]
-        batch_samples = images.size(0)
-        images = images.view(batch_samples, images.size(1), -1)  # [batch, 3, H*W]
-        mean += images.mean(2).sum(0)
-        std += images.std(2).sum(0)
-        total_samples += batch_samples
+        B, C, H, W = images.shape
+        images = images.view(B, C, -1)  # [B, 3, H*W]
+        # 对每个通道的所有像素求和
+        sum_ += images.sum(dim=(0, 2))          # shape [3]
+        sum_sq += (images ** 2).sum(dim=(0, 2))  # shape [3]
+        total_count += B * images.size(2)
 
-    mean /= total_samples
-    std /= total_samples
+    mean = sum_ / total_count
+    var = (sum_sq / total_count) - mean * mean
+    std = torch.sqrt(var)
 
     return mean.numpy(), std.numpy()
 

@@ -11,7 +11,7 @@ def Train_data_Loader():
         transforms.RandomCrop(32, padding=4),  #先四周填充0，在把图像随机裁剪成32*32
         transforms.RandomHorizontalFlip(),  #图像一半的概率翻转，一半的概率不翻转
         transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406],std=[0.229, 0.224, 0.225])])
+        transforms.Normalize(mean=[0.4913, 0.4822, 0.4465],std=[0.229, 0.224, 0.225])])
 
     data_dir = parameters.get_parameters().data_dir
 

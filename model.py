@@ -18,17 +18,19 @@ class Basic_block(nn.Module):
         self.in_chan = in_chan
         self.out_chan = out_chan
         self.conv1 = nn.Conv2d(in_channels=in_chan, out_channels=out_chan, kernel_size=3, stride=str, padding=1)        
-        self.bn1 = nn.BatchNorm2d(num_features=out_chan)
+        self.bn1 = nn.BatchNorm2d(num_features=out_chan) # 第一个conv后需要进行bn
         self.activation = F.relu
         self.conv2 = nn.Conv2d(in_channels=out_chan, out_channels=out_chan, kernel_size=3, stride=1, padding=1)
+        self.bn2 = nn.BatchNorm2d(num_features=out_chan) # 第二个conv后需要进行bn
         self.ds = nn.Conv2d(in_channels=in_chan, out_channels=out_chan, kernel_size=1, stride=2, bias=False)
+        self.bn3 = nn.BatchNorm2d(num_features=out_chan) # downsample后需要进行bn
     
     def downsample(self,x):
         if self.in_chan == self.out_chan:
             output = x
         elif self.in_chan != self.out_chan:
             output = self.ds(x)
-            output = self.bn1(output)
+            output = self.bn3(output)
 
         return output
 
@@ -40,7 +42,7 @@ class Basic_block(nn.Module):
         x1 = self.activation(x1)
 
         x1 = self.conv2(x1)
-        x1 = self.bn1(x1)
+        x1 = self.bn2(x1)
         x1 = self.activation(x1+re)
 
         return x1
