@@ -5,6 +5,7 @@ import DataLoader
 from test import test
 import os
 import parameters
+import torch.optim.lr_scheduler as lr_scheduler
 
 def train(model, num_epoch):
     print("Start training")
@@ -13,6 +14,7 @@ def train(model, num_epoch):
     params = parameters.get_parameters()
     device = params.device if torch.cuda.is_available() else "cpu"
     optimizer = torch.optim.AdamW(model.parameters(), lr=params.learning_rate)
+    scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epoch)  # 初始化余弦退火调度器
     loss_history = [] # 记录每个 epoch 的平均训练损失
     success_history = [] # 记录每个 epoch 的训练成功率
     val_loss_history = []  # 记录每个 epoch 的平均验证损失
@@ -62,7 +64,9 @@ def train(model, num_epoch):
         success_rate_epoch = (correct_preds_all/train_num_all).item()
         print('epoch {} training finish! The success rate is {}, and the average loss is {}'.format(epoch,success_rate_epoch, avg_loss))
         success_history.append(success_rate_epoch)
-        loss_history.append(avg_loss)   
+        loss_history.append(avg_loss)
+
+        scheduler.step()  # 更新学习率
 
         # validate after each training epoch
         model.eval()  # 切换到验证模式
