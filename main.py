@@ -7,6 +7,10 @@ import os
 import numpy as np
 from plot import plot_training_loss, plot_validation_loss, plot_success_rate, plot_validation_success_rate, plot_learning_rate_comparison
 import parameters
+from utils import set_seed
+
+# Set the random seed for reproducibility
+set_seed(3407)
 
 # model = Model()
 model = Model_32()

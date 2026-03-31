@@ -68,7 +68,7 @@ def Test_data_Loader():
     test_loader = Data.DataLoader(
             dataset=testset,  
             batch_size=parameters.get_parameters().batch_size, 
-            shuffle=True,  
+            shuffle=False,  
             num_workers=parameters.get_parameters().num_workers,
         )
  
