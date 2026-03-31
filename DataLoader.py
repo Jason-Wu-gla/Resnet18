@@ -7,17 +7,26 @@ import numpy as np
 import parameters
 
 def Train_data_Loader():
-    transform = transforms.Compose([
+    transform_train = transforms.Compose([
         transforms.RandomCrop(32, padding=4),  #先四周填充0，在把图像随机裁剪成32*32
         transforms.RandomHorizontalFlip(),  #图像一半的概率翻转，一半的概率不翻转
         transforms.ToTensor(),
-        transforms.Normalize(mean=[0.4913, 0.4822, 0.4465],std=[0.229, 0.224, 0.225])])
+        transforms.Normalize(mean=[0.4913, 0.4821, 0.4465],std=[0.2470, 0.2435, 0.2616])
+    ])
+
+    transform_valid = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.4913, 0.4821, 0.4465],std=[0.2470, 0.2435, 0.2616])
+    ])
 
     data_dir = parameters.get_parameters().data_dir
 
     trainset = torchvision.datasets.CIFAR10(root=data_dir, train=True,
-                                            download=True, transform=transform)
-    
+                                            download=True, transform=transform_train)
+
+    validset = torchvision.datasets.CIFAR10(root=data_dir, train=True,
+                                            download=True, transform=transform_valid)
+
     valid_size = parameters.get_parameters().valid_size
     num_train = len(trainset)
     indices = list(range(num_train))
@@ -34,21 +43,21 @@ def Train_data_Loader():
             sampler=train_sampler,  
             num_workers=parameters.get_parameters().num_workers,
         )
-    
+
     valid_loader = Data.DataLoader(
-            dataset=trainset,  
+            dataset=validset,  
             batch_size=parameters.get_parameters().batch_size, 
             sampler=valid_sampler,  
             num_workers=parameters.get_parameters().num_workers,
         )
-    
+
     return train_loader, valid_loader
 
 
 def Test_data_Loader():
     transform = transforms.Compose([
         transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406],std=[0.229, 0.224, 0.225])
+        transforms.Normalize(mean=[0.4913, 0.4821, 0.4465],std=[0.2470, 0.2435, 0.2616])
     ])
 
     data_dir = parameters.get_parameters().data_dir

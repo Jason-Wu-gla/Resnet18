@@ -35,6 +35,7 @@ def train(model, num_epoch):
         total_loss = 0
 
         # train
+        model.train()  # 切换到训练模式
         for step, (images, labels) in enumerate(trainset):
             global_step += 1  # 更新全局训练步数
             images = images.to(device)
@@ -64,6 +65,7 @@ def train(model, num_epoch):
         loss_history.append(avg_loss)   
 
         # validate after each training epoch
+        model.eval()  # 切换到验证模式
         val_correct = 0
         val_num_all = 0
         val_total_loss = 0
