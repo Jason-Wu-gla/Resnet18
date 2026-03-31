@@ -6,21 +6,7 @@ from test import test
 import os
 import parameters
 import torch.optim.lr_scheduler as lr_scheduler
-from torch.optim.lr_scheduler import LambdaLR
 
-def exponential_warmup_scheduler(optimizer, warmup_steps, base_lr):
-    """
-    Returns a LambdaLR scheduler with exponential warmup.
-    :param optimizer: Optimizer to apply the scheduler to.
-    :param warmup_steps: Number of warmup steps.
-    :param base_lr: Base learning rate after warmup.
-    """
-    def lr_lambda(step):
-        if step < warmup_steps:
-            return (step / warmup_steps) ** 2  # Exponential warmup
-        return 1.0  # After warmup, keep the learning rate constant (handled by other schedulers)
-
-    return LambdaLR(optimizer, lr_lambda)
 
 def train(model, num_epoch):
     print("Start training")
@@ -28,18 +14,11 @@ def train(model, num_epoch):
     trainset, validset = DataLoader.Train_data_Loader()
     params = parameters.get_parameters()
     device = params.device if torch.cuda.is_available() else "cpu"
-    warmup_steps = params.warmup_steps  # Add warmup steps parameter in parameters.py
     base_lr = params.learning_rate
 
-    # Initialize optimizer and warmup scheduler
+    # Initialize optimizer and cosine annealing scheduler
     optimizer = torch.optim.AdamW(model.parameters(), lr=base_lr)
-    warmup_scheduler = exponential_warmup_scheduler(optimizer, warmup_steps, base_lr)
-
-    # Initialize cosine annealing scheduler
-    cosine_scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epoch - warmup_steps)
-
-    # Combine warmup and cosine annealing
-    scheduler = lr_scheduler.SequentialLR(optimizer, schedulers=[warmup_scheduler, cosine_scheduler], milestones=[warmup_steps])
+    scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epoch)
 
     loss_history = [] # 记录每个 epoch 的平均训练损失
     success_history = [] # 记录每个 epoch 的训练成功率
