@@ -5,14 +5,24 @@ import torchvision.transforms as transforms
 from torch.utils.data.sampler import SubsetRandomSampler
 import numpy as np
 import parameters
+from utils import Cutout    
 
 def Train_data_Loader():
-    transform_train = transforms.Compose([
-        transforms.RandomCrop(32, padding=4),  #先四周填充0，在把图像随机裁剪成32*32
-        transforms.RandomHorizontalFlip(),  #图像一半的概率翻转，一半的概率不翻转
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.4913, 0.4821, 0.4465],std=[0.2470, 0.2435, 0.2616])
-    ])
+    if parameters.get_parameters().use_cutout:
+        transform_train = transforms.Compose([
+            transforms.RandomCrop(32, padding=4),  #先四周填充0，在把图像随机裁剪成32*32
+            transforms.RandomHorizontalFlip(),  #图像一半的概率翻转，一半的概率不翻转
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.4913, 0.4821, 0.4465],std=[0.2470, 0.2435, 0.2616]),
+            Cutout(n_holes=1, length=16)  # 添加 Cutout 数据增强
+        ])
+    else:
+        transform_train = transforms.Compose([
+            transforms.RandomCrop(32, padding=4),  #先四周填充0，在把图像随机裁剪成32*32
+            transforms.RandomHorizontalFlip(),  #图像一半的概率翻转，一半的概率不翻转
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.4913, 0.4821, 0.4465],std=[0.2470, 0.2435, 0.2616])
+        ])
 
     transform_valid = transforms.Compose([
         transforms.ToTensor(),

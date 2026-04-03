@@ -16,9 +16,17 @@ def train(model, num_epoch):
     device = params.device if torch.cuda.is_available() else "cpu"
     base_lr = params.learning_rate
 
-    # Initialize optimizer and cosine annealing scheduler
+    # Initialize optimizer and scheduler
     optimizer = torch.optim.AdamW(model.parameters(), lr=base_lr)
-    scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epoch)
+    if params.lr_scheduler == 'cosine':
+        scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epoch)
+    elif params.lr_scheduler == 'step':
+        scheduler = lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.1)
+    elif params.lr_scheduler == 'exponential':
+        scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=0.95)
+    else:
+        scheduler = None  # No scheduler
+    
 
     loss_history = [] # 记录每个 epoch 的平均训练损失
     success_history = [] # 记录每个 epoch 的训练成功率
@@ -55,7 +63,6 @@ def train(model, num_epoch):
             train_step_losses.append(loss.item())  # 记录当前step的损失值
             loss.backward()
             optimizer.step()
-            scheduler.step()  # Update learning rate
 
             with torch.no_grad():
                 probs, label_preds = preds.max(dim=1)
@@ -64,11 +71,12 @@ def train(model, num_epoch):
                 correct_preds_all += correct_preds
                 train_num_all += batch_size
                 if step % 10 == 0:
-                    print(f'epoch: {epoch} train step: {step} success rate: {success_rate:.3f}, loss: {loss.item():.3f}')
+                    print(f'epoch: {epoch} train step: {step} accuracy: {success_rate:.3f}, loss: {loss.item():.3f}')
 
+        scheduler.step()  # Update learning rate
         avg_loss = total_loss / train_num_all
         success_rate_epoch = (correct_preds_all/train_num_all).item()
-        print('epoch {} training finish! The success rate is {}, and the average loss is {}'.format(epoch,success_rate_epoch, avg_loss))
+        print('epoch {} training finish! The accuracy is {}, and the average loss is {}'.format(epoch,success_rate_epoch, avg_loss))
         success_history.append(success_rate_epoch)
         loss_history.append(avg_loss)
 
@@ -93,18 +101,18 @@ def train(model, num_epoch):
                 val_correct += val_correct_preds
                 val_num_all += val_batch_size
                 if val_step % 10 == 0:
-                    print(f'epoch: {epoch} valid step: {val_step} batch success rate: {val_batch_acc:.3f}, loss: {val_loss.item():.3f}')
+                    print(f'epoch: {epoch} valid step: {val_step} batch accuracy: {val_batch_acc:.3f}, loss: {val_loss.item():.3f}')
 
         val_avg_loss = val_total_loss / val_num_all
         val_success_rate = (val_correct / val_num_all).item()
-        print("epoch {} validation finish! The final success rate is {}, and the average loss is {}".format(epoch, val_success_rate, val_avg_loss))
+        print("epoch {} validation finish! The final accuracy is {}, and the average loss is {}".format(epoch, val_success_rate, val_avg_loss))
         val_loss_history.append(val_avg_loss)
         val_success_history.append(val_success_rate)
 
         # Checkpoint
         if val_avg_loss < best_val_loss:
             best_val_loss = val_avg_loss
-            best_model_path = os.path.join(saveDir, f"best_model_lr_{params.learning_rate}_epoch_{epoch+1}.pth")
+            best_model_path = os.path.join(saveDir, f"best_model_lr_{params.learning_rate}_bs_{params.batch_size}_sch_{params.lr_scheduler}_cutout_{params.use_cutout}.pth")
             torch.save(model.state_dict(), best_model_path)
             print(f"Best model updated and saved to {best_model_path} with validation loss {best_val_loss:.4f}")
 

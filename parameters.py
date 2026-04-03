@@ -4,12 +4,14 @@ def get_parameters():
     parser = argparse.ArgumentParser(description="Hyperparameters for ResNet18 training")
 
     # Training related
-    parser.add_argument('--num_epoch', type=int, default=50, help='Number of training epochs')
+    parser.add_argument('--num_epoch', type=int, default=60, help='Number of training epochs')
     parser.add_argument('--batch_size', type=int, default=2500, help='Batch size for training and validation')
     parser.add_argument('--learning_rate', type=float, default=5e-4, help='Learning rate for optimizer')
     parser.add_argument('--valid_size', type=float, default=0.2, help='Proportion of training data used for validation')
     parser.add_argument('--num_workers', type=int, default=2, help='Number of workers for data loading')
-
+    parser.add_argument('--lr_scheduler', type=str, default='cosine',
+                        choices=['cosine', 'step', 'exponential', 'none'],
+                        help='Type of learning rate scheduler')
     # Model related
     parser.add_argument('--model_save_dir', type=str, default='./model_weights/', help='Directory to save model weights')
 
@@ -18,6 +20,7 @@ def get_parameters():
 
     # Data related
     parser.add_argument('--data_dir', type=str, default='./data', help='Directory for dataset storage')
+    parser.add_argument('--use_cutout', type=int, default=0, choices=[0,1], help='Use Cutout augmentation (0/1)')
 
     return parser.parse_args()
 
