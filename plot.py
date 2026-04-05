@@ -2,57 +2,39 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-def plot_training_loss(loss_history, save_path=None, show=True):
-    epochs = range(1, len(loss_history) + 1)
-    
-    plt.figure(figsize=(8, 5))
-    plt.plot(epochs, loss_history, marker='o', linestyle='-', color='b', label='Average Loss')
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss of Training Set')
-    plt.title('Average Loss vs. Epoch (Training Set)')
-    plt.grid(True)
-    plt.legend()
 
+def plot_training_overview(success_history, val_success_history, loss_history, val_loss_history, test_accuracy=None, save_path=None, show=True):
+    epochs_acc = range(1, len(success_history) + 1)
+    epochs_loss = range(1, len(loss_history) + 1)
+
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+    # Left subplot: accuracy curves for train and valid sets
+    axes[0].plot(epochs_acc, success_history, marker='o', linestyle='-', color='g', label='Train Accuracy')
+    axes[0].plot(epochs_acc, val_success_history, marker='o', linestyle='-', color='m', label='Validation Accuracy')
+    axes[0].set_xlabel('Epoch')
+    axes[0].set_ylabel('Accuracy')
+    axes[0].set_title('Accuracy vs. Epoch')
+    axes[0].grid(True)
+    axes[0].legend()
+
+    # Right subplot: loss curves for train and valid sets
+    axes[1].plot(epochs_loss, loss_history, marker='o', linestyle='-', color='b', label='Train Loss')
+    axes[1].plot(epochs_loss, val_loss_history, marker='o', linestyle='-', color='r', label='Validation Loss')
+    axes[1].set_xlabel('Epoch')
+    axes[1].set_ylabel('Loss')
+    axes[1].set_title('Loss vs. Epoch')
+    axes[1].grid(True)
+    axes[1].legend()
+
+    if test_accuracy is not None:
+        fig.suptitle(f"Training Overview | Test Accuracy: {test_accuracy:.3f}", fontsize=14)
+    else:
+        fig.suptitle("Training Overview", fontsize=14)
+
+    fig.tight_layout(rect=[0, 0.03, 1, 0.93])
     _save_and_show(save_path, show)
 
-def plot_validation_loss(val_loss_history, save_path=None, show=True):
-    epochs = range(1, len(val_loss_history) + 1)
-    
-    plt.figure(figsize=(8, 5))
-    plt.plot(epochs, val_loss_history, marker='o', linestyle='-', color='r', label='Average Loss')
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss of Validation Set')
-    plt.title('Average Loss vs. Epoch (Validation Set)')
-    plt.grid(True)
-    plt.legend()
-
-    _save_and_show(save_path, show)
-
-def plot_success_rate(success_history, save_path=None, show=True):
-    epochs = range(1, len(success_history) + 1)
-    
-    plt.figure(figsize=(8, 5))
-    plt.plot(epochs, success_history, marker='o', linestyle='-', color='g', label='Accuracy')
-    plt.xlabel('Epoch')
-    plt.ylabel('Accuracy of Training Set')
-    plt.title('Accuracy vs. Epoch (Training Set)')
-    plt.grid(True)
-    plt.legend()
-
-    _save_and_show(save_path, show)
-
-def plot_validation_success_rate(val_success_history, save_path=None, show=True):
-    epochs = range(1, len(val_success_history) + 1)
-    
-    plt.figure(figsize=(8, 5))
-    plt.plot(epochs, val_success_history, marker='o', linestyle='-', color='m', label='Accuracy')
-    plt.xlabel('Epoch')
-    plt.ylabel('Accuracy of Validation Set')
-    plt.title('Accuracy vs. Epoch (Validation Set)')
-    plt.grid(True)
-    plt.legend()
-
-    _save_and_show(save_path, show)
 
 def plot_learning_rate_comparison(file_paths, save_path=None, show=True):
     plt.figure(figsize=(10, 6))

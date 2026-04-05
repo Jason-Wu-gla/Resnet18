@@ -34,6 +34,8 @@ def test(model):
     success_rate = (test_correct/test_num_all).item()
     print(f"Finish! The final success rate is {success_rate:.3f}, and the average loss is {avg_loss:.3f}")
 
+    return success_rate, avg_loss
+
 
 
 
