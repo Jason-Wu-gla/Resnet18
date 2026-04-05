@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Activate Python environment
-source ../venv/Scripts/activate
+source ./venv/Scripts/activate
 
 # Define hyperparameter values
 learning_rates=(1e-4 5e-5 1e-5 1e-6)
@@ -15,7 +15,7 @@ for lr in "${learning_rates[@]}"; do
     for scheduler in "${schedulers[@]}"; do
       for cutout in "${cutouts[@]}"; do
         echo "Running experiment with lr=$lr, batch_size=$bs, scheduler=$scheduler, cutout=$cutout"
-        python ../main.py \
+        python ./main.py \
           --learning_rate $lr \
           --batch_size $bs \
           --lr_scheduler $scheduler \
